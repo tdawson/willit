@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <title>Will It {{ repo['reponame']  }} Status</title>
+    <style>
+      table {
+        border-spacing: 0;
+      }
+      th, td {
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>{{ repo['reponame']  }} Repo Status</h1>
+    <p>
+      <a href="../status-overall.html">Overall Status</a>
+      <br>Page updated: {{ this_date }}
+    </p>
+  <h2>{{ repo['reponame']  }}</h2>
+    <table border=1>
+      <tr>
+        <td rowspan="3">{{ repo['reponame']  }}</td>
+        <td colspan="2">Total</td>
+        <td colspan="2">Install</td>
+      {% if repo['IsNext'] == 'True' %}
+        <td><a href="status-core-wont-install.html">Bad EPEL</a></td>
+      {% endif %}
+      {% if repo['test_build'] == 'True' %}
+        <td colspan="2">Build</td>
+      {% endif %}
+      {% if repo['test_bugz'] == 'True' %}
+        <td colspan="2">Bugz</td>
+      {% endif %}
+      {% if repo['test_duplicates'] == 'True' %}
+        <td>Dupes</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>Source</td>
+        <td>Binary</td>
+        <td colspan="2" bgcolor="{{ repo['ci_bcolor'] }}">Binary</td>
+      {% if repo['test_build'] == 'True' %}
+        <td colspan="2" bgcolor="{{ repo['cb_scolor'] }}">Source</td>
+      {% endif %}
+      {% if repo['IsNext'] == 'True' %}
+        <td>{{ repo['version'] }}</td>
+      {% endif %}
+      {% if repo['test_bugz'] == 'True' %}
+        <td>Total</td>
+        <td> CVE </td>
+      {% endif %}
+      {% if repo['test_duplicates'] == 'True' %}
+        <td>Dupes</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>{{ repo['snumber'] }}</td>
+        <td>{{ repo['bnumber'] }}</td>
+        <td>{{ repo['ci_bnumber_good'] }}</td>
+        <td>{{ repo['ci_bnumber_bad'] }}</td>
+      {% if repo['IsNext'] == 'True' %}
+        <td>{{ repo['ci_core_bnumber_bad'] }}</td>
+      {% endif %}
+      {% if repo['test_build'] == 'True' %}
+        <td>{{ repo['cb_snumber_good'] }}</td>
+        <td>{{ repo['cb_snumber_bad'] }}</td>
+      {% endif %}
+      {% if repo['test_bugz'] == 'True' %}
+        <td>{{ repo['bugz_total'] }}</td>
+        <td>{{ repo['bugz_total_cve'] }}</td>
+      {% endif %}
+      {% if repo['test_duplicates'] == 'True' %}
+        <td>{{ repo['duplicate_total'] }}</td>
+      {% endif %}
+      </tr>
+    </table>
+  <p>
+    <br><a href="index-packages.html">{{ repo['reponame']  }} Packages</a> ({{ thisNum  }})
+      {% if repo['test_install'] == 'True' %}
+    <br><a href="status-wont-install.html">{{ repo['reponame']  }} Packages that will not install</a> ( {{ badInstallNum  }} )
+        {% if repo['IsNext'] == 'True' %}
+      <br><a href="status-core-wont-install.html">{{ repo['version']  }} packages that will not install on CentOS Stream</a> ( {{ repo['ci_core_bnumber_bad']  }} )
+        {% endif %}
+      {% endif %}
+      {% if repo['test_build'] == 'True' %}
+    <br><a href="status-wont-build.html">{{ repo['reponame']  }} Packages that will not build</a> ( {{ badBuildNum  }} )
+      {% endif %}
+      {% if repo['test_bugz'] == 'True' %}
+    <br><a href="status-bugz-no-source.html">{{ repo['reponame']  }} Bugzilla Bugs with no corresponsing source package</a> ( {{ repo['bugz_total_no_source']  }} )
+    <br><a href="status-bugz-cve.html">{{ repo['reponame']  }} CVE Bugzilla Bugs </a> ( {{ repo['bugz_total_cve']  }} )
+      {% endif %}
+      {% if repo['test_duplicates'] == 'True' %}
+    <br><a href="status-duplicates.html">{{ repo['reponame']  }} Duplicate Packages With Upstream</a> ( {{ repo['duplicate_total']  }} )
+      {% endif %}
+  </p>
+      {% if repo['test_checked'] == 'True' %}
+
+  <h2>{{ repo['reponame']  }}-testing</h2>
+    <table border=1>
+      <tr>
+        <td rowspan="3">{{ repo['reponame']  }}-testing</td>
+          <td colspan="2">Total</td>
+        <td colspan="2">Install</td>
+        <td colspan="2">Build</td>
+      </tr>
+      <tr>
+        <td>Source</td>
+        <td>Binary</td>
+        <td colspan="2" bgcolor="{{ repo['test_ci_bcolor'] }}">Binary</td>
+        <td colspan="2" bgcolor="{{ repo['test_cb_scolor'] }}">Source</td>
+      </tr>
+      <tr>
+        <td>{{ repo['test_snumber'] }}</td>
+        <td>{{ repo['test_bnumber'] }}</td>
+        <td>{{ repo['test_ci_bnumber_good'] }}</td>
+        <td>{{ repo['test_ci_bnumber_bad'] }}</td>
+        <td>{{ repo['test_cb_snumber_good'] }}</td>
+        <td>{{ repo['test_cb_snumber_bad'] }}</td>
+      </tr>
+    </table>
+  <p>
+    <br><a href="index-packages.html">{{ repo['reponame']  }} Packages</a> ({{ thisTestNum  }})
+      {% if repo['test_install'] == 'True' %}
+    <br><a href="status-wont-install.html">{{ repo['reponame']  }} Packages that will not install</a> ( {{ testBadInstallNum  }} )
+      {% endif %}
+      {% if repo['test_build'] == 'True' %}
+    <br><a href="status-wont-build.html">{{ repo['reponame']  }} Packages that will not build</a> ( {{ testBadBuildNum  }} )
+      {% endif %}
+  </p>
+    {% endif %}
+
+  </body>
+</html>

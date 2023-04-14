@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>{{ repoName  }} Packages</title>
+  </head>
+  <body>
+  <h1>{{ repoName  }} Packages</h1>
+    <p>
+      <a href="status-repo.html">Repo Status</a> - 
+      <a href="../status-overall.html">Overall Status</a>
+      <br>Page updated: {{ this_date }}
+    </p>
+
+    <ul>
+        {% for spkg in spkgList -%}
+          <li>
+              {% if spkg['bug_count'] >= 1 %}
+              ({{ spkg['bug_count'] }})[{{ spkg['bug_count_cve'] }}]
+              {% endif %}
+              <a href="{{ pkgDir }}/{{ spkg['sname'] }}.html">{{ spkg['sname'] }}</a>  ({{ spkg['sname_day'] }})
+          </li>
+        {% endfor -%}
+    </ul>
+  </body>
+</html>

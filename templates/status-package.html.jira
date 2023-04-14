@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>{{ spkg['sname']  }} Info</title>
+  </head>
+  <body>
+  <h1>{{ spkg['sname']  }} Info</h1>
+    <p>
+      {{ spkg['sname']  }} was added to {{ repoName  }} repo on {{ spkg['sname_day'] }}
+      <br>Page updated: {{ this_date }}
+      <br><a href="../status-repo.html">Repo Status</a> -
+      <a href="../../status-overall.html">Overall Status</a>
+    </p>
+
+    <p>
+      Source NVR: <b>{{ spkg['snvr']  }}</b> ({{ spkg['snvr_day'] }})
+    </p>
+
+    <h2>Binary Packages</h2>
+    <table border=0>
+      {% for bp in spkg['binaries'] -%}
+        <tr>
+          <td>{{ bp['bname'] }}</td>
+          <td><b>{{ bp['bnvr'] }}</b></td>
+        </tr>
+      {% endfor -%}
+    </table>
+
+    <h2>Bugs</h2>
+    <table border=1>
+      {% for bp in spkg['bugz'] -%}
+        <tr>
+          <td><a href="https://bugzilla.redhat.com/show_bug.cgi?id={{ bp['id'] }}">{{ bp['id'] }}</a></td>
+          <td>{{ bp['status'] }}</td>
+          <td>{{ bp['summary'] }}</td>
+        </tr>
+      {% endfor -%}
+    </table>
+
+    <h2>Install Failures</h2>
+      {% for bi in spkg['bad_installs'] -%}
+        <p>
+          Package: <b>{{ bi['bnvr'] }}</b> ({{ bi['day'] }})
+          <br>Error: {{ bi['error'] }}
+        </p>
+      {% endfor -%}
+
+  </body>
+</html>

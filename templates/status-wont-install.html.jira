@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <title>Will It Install on {{ repo['reponame']  }}</title>
+    <style>
+      table {
+        border-spacing: 0;
+      }
+      th, td {
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>Will It Install on {{ repo['reponame']  }}</h1>
+    <p>
+      <a href="status-repo.html">Repo Status</a> - 
+      <a href="../status-overall.html">Overall Status</a>
+      <br>Page updated: {{ this_date }}
+    </p>
+  <h2>{{ repo['reponame']  }}</h2>
+
+    <h3>Packages that will not install</h3>
+    <ul>
+      {% for bb in badInstall -%}
+        <li><a href="packages/{{ bb['sname'] }}.html">{{ bb['bnvr'] }}</a> ({{ bb['day'] }})</li>
+      {% endfor -%}
+    </ul>
+
+    <h3>Errors when install is tried</h3>
+
+    {% for bb in badInstall -%}
+      <p>Package: <a href="packages/{{ bb['sname'] }}.html">{{ bb['bnvr'] }}</a> ({{ bb['day'] }})
+      <br>Error: {{ bb['error'] }}
+      </p>
+    {% endfor -%}
+
+      
+  {% if repo['test_checked'] == 'True' %}
+
+  <h2>{{ repo['reponame']  }}-testing</h2>
+
+    <h3>Packages that will not install</h3>
+    <ul>
+      {% for bb in testBadInstall -%}
+        <li><a href="packages/{{ bb['sname'] }}.html">{{ bb['bnvr'] }}</a> ({{ bb['day'] }})</li>
+      {% endfor -%}
+    </ul>
+
+    <h3>Errors when install is tried</h3>
+
+    {% for bb in testBadInstall -%}
+      <p>Package: <a href="packages/{{ bb['sname'] }}.html">{{ bb['bnvr'] }}</a> ({{ bb['day'] }})
+      <br>Error: {{ bb['error'] }}
+      </p>
+    {% endfor -%}
+  
+  {% endif %}
+
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <title>Will It Overall Status</title>
+    <style>
+      table {
+        border-spacing: 0;
+      }
+      th, td {
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>Overall Repo Status</h1>
+    <p>Page updated: {{ this_date }}</p>
+    <br>
+    
+  {% for r in repos -%}
+    <h1><a href="{{ r['reponame']  }}/status-repo.html">{{ r['reponame']  }}</a></h1>
+    <table border=1>
+      <tr>
+        <td rowspan="3">{{ r['reponame']  }}</td>
+        <td colspan="2">Total</td>
+      {% if r['test_install'] == 'True' %}
+        <td colspan="2"><a href="{{ r['reponame']  }}/status-wont-install.html">Install</a></td>
+        {% if r['IsNext'] == 'True' %}
+          <td><a href="{{ r['reponame']  }}/status-core-wont-install.html">Bad EPEL</a></td>
+        {% endif %}
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td colspan="4"><a href="{{ r['reponame']  }}/status-wont-build.html">Build</a></td>
+      {% endif %}
+      {% if r['test_bugz'] == 'True' %}
+        <td colspan="2">Bugz</td>
+      {% endif %}
+      {% if r['test_duplicates'] == 'True' %}
+        <td>Dupes</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>Source</td>
+        <td>Binary</td>
+      {% if r['test_install'] == 'True' %}
+        <td colspan="2" bgcolor="{{ r['ci_bcolor'] }}">Binary</td>
+        {% if r['IsNext'] == 'True' %}
+          <td>{{ r['version'] }}</td>
+        {% endif %}
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td colspan="2" bgcolor="{{ r['cb_scolor'] }}">Source</td>
+      {% endif %}
+      {% if r['test_bugz'] == 'True' %}
+        <td>Total</td>
+        <td> CVE </td>
+      {% endif %}
+      {% if r['test_duplicates'] == 'True' %}
+        <td>Dupes</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>{{ r['snumber'] }}</td>
+        <td>{{ r['bnumber'] }}</td>
+      {% if r['test_install'] == 'True' %}
+        <td>{{ r['ci_bnumber_good'] }}</td>
+        <td>{{ r['ci_bnumber_bad'] }}</td>
+        {% if r['IsNext'] == 'True' %}
+          <td>{{ r['ci_core_bnumber_bad'] }}</td>
+        {% endif %}
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td>{{ r['cb_snumber_good'] }}</td>
+        <td>{{ r['cb_snumber_bad'] }}</td>
+      {% endif %}
+      {% if r['test_bugz'] == 'True' %}
+        <td>{{ r['bugz_total'] }}</td>
+        <td>{{ r['bugz_total_cve'] }}</td>
+      {% endif %}
+      {% if r['test_duplicates'] == 'True' %}
+        <td>{{ r['duplicate_total'] }}</td>
+      {% endif %}
+      </tr>
+      
+      {% if r['test_checked'] == 'True' %}
+      <tr>
+        <td rowspan="3">{{ r['reponame']  }}-testing</td>
+        <td colspan="2">Total</td>
+      {% if r['test_install'] == 'True' %}
+        <td colspan="2">Install</td>
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td colspan="2">Build</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>Source</td>
+        <td>Binary</td>
+      {% if r['test_install'] == 'True' %}
+        <td colspan="2" bgcolor="{{ r['test_ci_bcolor'] }}">Binary</td>
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td colspan="2" bgcolor="{{ r['test_cb_scolor'] }}">Source</td>
+      {% endif %}
+      </tr>
+      <tr>
+        <td>{{ r['test_snumber'] }}</td>
+        <td>{{ r['test_bnumber'] }}</td>
+      {% if r['test_install'] == 'True' %}
+        <td>{{ r['test_ci_bnumber_good'] }}</td>
+        <td>{{ r['test_ci_bnumber_bad'] }}</td>
+      {% endif %}
+      {% if r['test_build'] == 'True' %}
+        <td>{{ r['test_cb_snumber_good'] }}</td>
+        <td>{{ r['test_cb_snumber_bad'] }}</td>
+      {% endif %}
+      </tr>
+      {% endif %}
+    </table>
+
+  {% endfor -%}
+
+  </body>
+</html>
