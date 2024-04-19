@@ -254,8 +254,11 @@ for this_repo in input_config['repos']:
       ## Get the source rpms out of the binary package list
       print("      Gathering upstream source package names ... ", end='')
       for bpkg in upstream_bpkg_list:
-        sourcenvr = bpkg.sourcerpm.rsplit(".",2)[0]
-        sourcename = sourcenvr.rsplit("-",2)[0]
+        if bpkg.sourcerpm:
+          sourcenvr = bpkg.sourcerpm.rsplit(".",2)[0]
+          sourcename = sourcenvr.rsplit("-",2)[0]
+        else:
+          sourcename = bpkg.name
         if sourcename not in upstream_source_names:
           upstream_source_names.append(sourcename)
       print(len(upstream_source_names))
