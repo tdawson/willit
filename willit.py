@@ -65,9 +65,12 @@ def will_pkg_install(pkg, style, repo_info):
       for other_repo in repo_info['OtherRepos']:
         base.repos.add_new_repo(other_repo['OtherRepoName'], conf, baseurl=[other_repo['OtherRepoURL']])
     base.fill_sack(load_system_repo=False)
-    base.install(pkg)
     try:
+      base.install(pkg)
       base.resolve()
+    except dnf.exceptions.PackageNotFoundError as e:
+      this_status['status'] = "fail"
+      this_status['error'] = str(e)
     except dnf.exceptions.DepsolveError as e:
       this_status['status'] = "fail"
       this_status['error'] = str(e)
