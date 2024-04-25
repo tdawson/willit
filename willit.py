@@ -601,9 +601,14 @@ for this_repo in input_config['repos']:
 ## Overall Section
 Path("output").mkdir(parents=True, exist_ok=True)
 
-# Write out Overall json file
-with open('output/status-overall.json', 'w') as file:
-    json.dump(mainList, file)
+if len(input_config['repos']) > 0:
+  # Write out Overall json file
+  with open('output/status-overall.json', 'w') as file:
+      json.dump(mainList, file)
+else:
+  # Load old status-overall.json data as base
+  with open('output/status-overall.json', 'r') as file:
+      mainList = json.load(file)
 
 # Write out Overall Status Page
 with open('templates/status-overall.html.jira') as f:
