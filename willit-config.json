@@ -2,7 +2,7 @@
   [
     {
       "RepoName": "epel10",
-      "RepoURL": "https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/os/",
+      "RepoURL": "https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/",
       "IsNext": "False",
       "CheckBugz": "False",
       "CheckTest": "False",
