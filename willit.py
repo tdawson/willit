@@ -77,30 +77,20 @@ def will_pkg_install(pkg, style, repo_info):
   return this_status
 
 # We need to iterate to get all the bugzilla bugs
-def _iterate_bugzilla_query(querydata):
+def _iterate_bugzilla_query(querydata, bzapi_instance):
     """Iterate Bugzilla query until all results are fetched."""
     print("    Getting next page of bugz")
-    results = bzapi.query(querydata)
+    results = bzapi_instance.query(querydata)
     if len(results) == bz_page_size:
         last_result_id = results[-1].id
         querydata['f1'] = 'bug_id'
         querydata['o1'] = 'greaterthan'
         querydata['v1'] = last_result_id
-        results += _iterate_bugzilla_query(querydata)
+        results += _iterate_bugzilla_query(querydata, bzapi_instance)
     return results
 
-with open('willit-config.json') as json_file:
-  input_config = json.load(json_file)
-
-## Repo Section
-for this_repo in input_config['repos']:
-  #print('RepoName: ' + this_repo['RepoName'])
-  #print('RepoURL: ' + this_repo['RepoURL'])
-  #print('CheckTest: ' + this_repo['CheckTest'])
-  #print('CheckInstall: ' + this_repo['CheckInstall'])
-  #print('CheckBuild: ' + this_repo['CheckBuild'])
-  #print('TestRepoURL: ' + this_repo['TestRepoURL'])
-  #print('OtherRepos: ' + str(this_repo['OtherRepos']))
+def process_repository(this_repo, old_repo_data=None, old_core_repo_data=None):
+  """Process a single repository and return results"""
   print("")
   print("Working On: " + this_repo['RepoName'])
   this_overall = {}
@@ -116,16 +106,26 @@ for this_repo in input_config['repos']:
     version = None
     print("    Repo Name not in list, not checking bugz even if it is set")
     this_overall["test_bugz"] = "False"
-  try:
-    with open('output/' + this_repo['RepoName'] + '/status-repo.json', 'r') as jsonfile:
-        old_repo = json.load(jsonfile)
-  except IOError:
-    old_repo = {}
-  try:
-    with open('output/' + version + '/status-repo.json', 'r') as jsonfile:
-        old_core_repo = json.load(jsonfile)
-  except IOError:
-    old_core_repo = {}
+  
+  # Use passed data or try to load from files
+  if old_repo_data is not None:
+    old_repo = old_repo_data
+  else:
+    try:
+      with open('output/' + this_repo['RepoName'] + '/status-repo.json', 'r') as jsonfile:
+          old_repo = json.load(jsonfile)
+    except IOError:
+      old_repo = {}
+      
+  if old_core_repo_data is not None:
+    old_core_repo = old_core_repo_data
+  else:
+    try:
+      with open('output/' + version + '/status-repo.json', 'r') as jsonfile:
+          old_core_repo = json.load(jsonfile)
+    except IOError:
+      old_core_repo = {}
+
   this_spkg_list = {}
   core_spkg_list = {}
   this_bugz_no_source = []
@@ -208,7 +208,7 @@ for this_repo in input_config['repos']:
       bquery["offset"] = 0
       bquery["order"] = "bug_id"
       bugz = []
-      bugz = _iterate_bugzilla_query(bquery)
+      bugz = _iterate_bugzilla_query(bquery, bzapi)
       for bug in bugz:
         print("    Bug: {0} {1} {2} {3}".format(bug.id, bug.component, bug.status, bug.summary))
         this_bug = {}
@@ -599,21 +599,80 @@ for this_repo in input_config['repos']:
           repoName=this_repo['RepoName'],
           spkg=spkg))
 
+  # Return the repository results
+  return this_overall
 
-## Overall Section
-Path("output").mkdir(parents=True, exist_ok=True)
 
-# Write out Overall json file
-with open('output/status-overall.json', 'w') as file:
-    json.dump(mainList, file)
+if __name__ == "__main__":
+    with open('willit-config.json') as json_file:
+      input_config = json.load(json_file)
 
-# Write out Overall Status Page
-with open('templates/status-overall.html.jira') as f:
-  tmpl = Template(f.read())
-with open('output/status-overall.html', 'w') as w:
-  w.write(tmpl.render(
-    this_date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
-    color_good=color_good,
-    color_bad=color_bad,
-    color_not=color_not,
-    repos=mainList))
+    # Separate repositories into independent and dependent
+    independent_repos = [repo for repo in input_config['repos'] if repo.get('IsNext') != 'True']
+    dependent_repos = [repo for repo in input_config['repos'] if repo.get('IsNext') == 'True']
+
+    print(f"Processing {len(independent_repos)} independent repositories in parallel...")
+
+    # Phase 1: Process independent repositories in parallel
+    phase1_results = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        future_to_repo = {
+            executor.submit(process_repository, repo): repo 
+            for repo in independent_repos
+        }
+        
+        for future in concurrent.futures.as_completed(future_to_repo):
+            try:
+                result = future.result()
+                phase1_results.append(result)
+                print(f"Completed: {result['reponame']}")
+            except Exception as exc:
+                repo = future_to_repo[future]
+                print(f"Repository {repo['RepoName']} generated an exception: {exc}")
+
+    # Phase 2: Process dependent repositories (need core repo data)
+    print(f"Processing {len(dependent_repos)} dependent repositories...")
+    phase2_results = []
+
+    if dependent_repos:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            futures = []
+            for repo in dependent_repos:
+                # Find the core repo data this dependent repo needs
+                core_data = None
+                if repo['RepoName'] == 'epel9-next':
+                    for result in phase1_results:
+                        if result['reponame'] == 'epel9':
+                            core_data = result
+                            break
+                
+                futures.append(executor.submit(process_repository, repo, None, core_data))
+            
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    result = future.result()
+                    phase2_results.append(result)
+                    print(f"Completed: {result['reponame']}")
+                except Exception as exc:
+                    print(f"Dependent repository generated an exception: {exc}")
+
+    # Combine all results
+    mainList = phase1_results + phase2_results
+
+    ## Overall Section
+    Path("output").mkdir(parents=True, exist_ok=True)
+
+    # Write out Overall json file
+    with open('output/status-overall.json', 'w') as file:
+        json.dump(mainList, file)
+
+    # Write out Overall Status Page
+    with open('templates/status-overall.html.jira') as f:
+      tmpl = Template(f.read())
+    with open('output/status-overall.html', 'w') as w:
+      w.write(tmpl.render(
+        this_date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
+        color_good=color_good,
+        color_bad=color_bad,
+        color_not=color_not,
+        repos=mainList))
