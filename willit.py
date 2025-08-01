@@ -615,7 +615,7 @@ if __name__ == "__main__":
 
     # Phase 1: Process independent repositories in parallel
     phase1_results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
         future_to_repo = {
             executor.submit(process_repository, repo): repo 
             for repo in independent_repos
@@ -635,7 +635,7 @@ if __name__ == "__main__":
     phase2_results = []
 
     if dependent_repos:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
             futures = []
             for repo in dependent_repos:
                 # Find the core repo data this dependent repo needs
