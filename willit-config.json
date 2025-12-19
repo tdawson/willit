@@ -21,6 +21,26 @@
         ]
     },
     {
+      "RepoName": "epel10z",
+      "RepoURL": "https://dl.fedoraproject.org/pub/epel/10z/Everything/x86_64/",
+      "IsNext": "False",
+      "CheckBugz": "False",
+      "CheckTest": "False",
+      "CheckInstall": "True",
+      "CheckBuild": "False",
+      "CheckDuplicates": "False",
+      "TestRepoURL": "https://dl.fedoraproject.org/pub/epel/testing/10z/Everything/x86_64/",
+      "OtherRepos":
+        [
+          {"OtherRepoName": "appstream",
+            "OtherRepoURL": "https://repo.almalinux.org/almalinux/10/AppStream/x86_64/os/"},
+          {"OtherRepoName": "baseos",
+            "OtherRepoURL": "https://repo.almalinux.org/almalinux/10/BaseOS/x86_64/os/"},
+          {"OtherRepoName": "crb",
+            "OtherRepoURL": "https://repo.almalinux.org/almalinux/10/CRB/x86_64/os/"}
+        ]
+    },
+    {
       "RepoName": "epel9",
       "RepoURL": "https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/",
       "IsNext": "False",
