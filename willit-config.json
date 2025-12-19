@@ -13,11 +13,11 @@
       "OtherRepos":
         [
           {"OtherRepoName": "appstream",
-            "OtherRepoURL": "https://composes.stream.centos.org/stream-10/production/latest-CentOS-Stream/compose/AppStream/x86_64/os/"},
+            "OtherRepoURL": "https://mirror.stream.centos.org/10-stream/AppStream/x86_64/os/"},
           {"OtherRepoName": "baseos",
-            "OtherRepoURL": "https://composes.stream.centos.org/stream-10/production/latest-CentOS-Stream/compose/BaseOS/x86_64/os/"},
+            "OtherRepoURL": "https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/"},
           {"OtherRepoName": "crb",
-            "OtherRepoURL": "https://composes.stream.centos.org/stream-10/production/latest-CentOS-Stream/compose/CRB/x86_64/os/"}
+            "OtherRepoURL": "https://mirror.stream.centos.org/10-stream/CRB/x86_64/os/"}
         ]
     },
     {
@@ -56,11 +56,11 @@
           {"OtherRepoName": "epel9", 
             "OtherRepoURL": "https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/"},
           {"OtherRepoName": "appstream", 
-            "OtherRepoURL": "https://composes.stream.centos.org/production/latest-CentOS-Stream/compose/AppStream/x86_64/os/"},
+            "OtherRepoURL": "https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/"},
           {"OtherRepoName": "baseos", 
-            "OtherRepoURL": "https://composes.stream.centos.org/production/latest-CentOS-Stream/compose/BaseOS/x86_64/os/"},
+            "OtherRepoURL": "https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/"},
           {"OtherRepoName": "crb", 
-            "OtherRepoURL": "https://composes.stream.centos.org/production/latest-CentOS-Stream/compose/CRB/x86_64/os/"}          
+            "OtherRepoURL": "https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/"}
         ]
     },
     {
